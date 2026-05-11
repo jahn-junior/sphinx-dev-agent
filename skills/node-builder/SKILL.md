@@ -35,28 +35,126 @@ Follow these steps:
 
 ### Generate Python code
 
-1. lorem ipsum
+Write Python code that creates a list of docutils nodes matching the content of the
+`/tmp/nodes.txt` file. Use the example at the end of this file as a reference.
+
+Also follow these guidelines:
+
+- Nodes should be declared before their child nodes.
+- If possible, nodes should be declared and added to their parent in one line.
+- Nodes should have classes and content assigned before child nodes are added.
+- Nodes should only be added to a parent node once all child nodes have been assigned.
+- If a string is used more than three times, it should be assigned to a variable.
+- Structures like tables should be added to a container node.
+
+Write the generated code to the `/tmp/nodegen.py` file so it can be called during
+testing.
 
 ### Test the generated code
 
-1. lorem ipsum
+Before you write the code to a file or the chat, you must ensure that the output
+of the generated Python code matches the parsed reStructuredText.
+
+1. Run the generated code with `python3 /tmp/nodegen.py`
+2. Verify that this output matches the contents of the `/tmp/nodes.txt` file
+3. If the output does not match, adjust `/tmp/nodegen.py` and repeat
+
+Once the output matches, share the code by either writing it to the requested file
+or displaying it in chat.
 
 ## Example
 
 Given the following reStructuredText input:
 
 ```
+Heading
+=======
+
+.. important
+
+    Admonition text
+
+*Emphasis*
+
+**Strong emphasis**
+
+``Monospaced``
+
+.. list-table::
+    :header-rows: 1
+
+    * - 1.1
+      - 1.2
+    * - 2.1
+      - 2.2
+
+.. code-block::
+
+    literal block
+
+```
+
+The contents of the `/tmp/nodes.txt` file would be:
+
+```
 lorem ipsum
 ```
 
-The output of step 4 will be:
-
-```
-lorem ipsum
-```
-
-The Python code generated in step 5 would be:
+The generated Python code would be:
 
 ```python
-lorem ipsum
+title_node = nodes.title(text="Heading")
+
+admonition_node = nodes.important()
+admonition_content = nodes.paragraph()
+admonition_content += nodes.Text("Admonition text")
+admonition_node += admonition_content
+
+italic_paragraph = nodes.paragraph()
+italic_paragraph += nodes.emphasis(text="Emphasis")
+
+bold_paragraph = nodes.paragraph()
+bold_paragraph += nodes.strong(text="Strong emphasis")
+
+monospaced_paragraph = nodes.paragraph()
+monospaced_paragraph += nodes.literal(text="Monospaced")
+
+div_node = nodes.container()
+table_node = nodes.table()
+div_node += table_node()
+
+table_group = nodes.tgroup(cols=2)
+table_group += nodes.colspec(width=50)
+table_group += nodes.colspec(width=50)
+table_node += table_group
+
+table_head = nodes.thead()
+header_row = nodes.row()
+
+entry_1_1 = nodes.entry()
+entry_1_1 += nodes.paragraph(text="1.1")
+header_row = entry_1_1
+
+entry_1_2 = nodes.entry()
+entry_1_2 += nodes.paragraph(text="1.2")
+header_row += entry_1_2
+
+table_head += header_row
+table_node += table_head
+
+table_body = nodes.tbody()
+body_row = nodes.row()
+
+entry_2_1 = nodes.entry()
+entry_2_1 += nodes.paragraph(text="2.1")
+body_row += entry_2_1
+
+entry_2_2 = nodes.entry()
+entry_2_2 += nodes.paragraph(text="2.2")
+body_row += entry_2_2
+
+table_body += body_row
+table_node += table_body
+
+code_block_node = nodes.literal_block(text="literal block")
 ```
